@@ -1,0 +1,12 @@
+{
+    "starting": "ScrapPY wird gestartet...",
+    "enter_path": "Bitte geben Sie den Pfad der PDF-Datei an: ",
+    "file_not_exist": "Fehler: Die angegebene PDF-Datei existiert nicht.",
+    "not_pdf": "Fehler: Die angegebene Datei ist keine PDF.",
+    "choose_mode": "Bitte wählen Sie einen Betriebsmodus: ",
+    "output_file": "Bitte geben Sie den Namen der Ausgabedatei an (leer lassen für Standard): ",
+    "processing": "Verarbeitung...",
+    "complete": "Verarbeitung abgeschlossen.",
+    "error": "Ein Fehler ist aufgetreten"
+  }
+  
