@@ -1,0 +1,12 @@
+{
+    "starting": "Démarrage de ScrapPY...",
+    "enter_path": "Veuillez entrer le chemin du fichier PDF : ",
+    "file_not_exist": "Erreur : Le fichier PDF spécifié n'existe pas.",
+    "not_pdf": "Erreur : Le fichier spécifié n'est pas un PDF.",
+    "choose_mode": "Veuillez choisir un mode de fonctionnement : ",
+    "output_file": "Veuillez entrer le nom du fichier de sortie (laisser vide pour par défaut) : ",
+    "processing": "Traitement...",
+    "complete": "Traitement terminé.",
+    "error": "Une erreur s'est produite"
+  }
+  
