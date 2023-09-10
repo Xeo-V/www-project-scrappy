@@ -36,13 +36,15 @@ ScrapPY is an innovative and comprehensive Python utility, designed to scan PDF 
 ## 💽 Installation
 
 1. **Clone the Repository**:
-    ```bash
+
+    ```
     mkdir MyScrapPY
     cd MyScrapPY/
-    git clone https://github.com/[YourUsername]/ScrapPY.git
+    git clone https://github.com/Xeo-V/ScrapPY.git
     ```
 2. **Install Dependencies**:
-    ```bash
+
+    ```
     pip3 install -r requirements.txt
     ```
 
@@ -62,7 +64,7 @@ python3 MyScrapPY.py
 
 The program features an ASCII progress bar to give you real-time updates on its operation.
 
-```bash
+```
 [====================100====================]
 ```
 
@@ -112,4 +114,3 @@ MIT License. See `LICENSE` for more information.
 
 ---
 
-© 2023 [YourUsername]
