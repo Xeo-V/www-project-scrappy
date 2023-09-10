@@ -1,126 +1,115 @@
-# :dog2: ScrapPY: PDF Scraping Made Easy
 
-<p align="center">
-<img width=40% height=40% src="https://user-images.githubusercontent.com/72598486/200046477-94c17a93-2dc8-418b-96eb-2b554227dce2.png">
-</p>
+# 🐕 ScrapPY: Advanced, User-Friendly PDF Analysis for Cybersecurity
 
-ScrapPY is a Python utility for scraping manuals, documents, and other sensitive PDFs to generate targeted wordlists that can be utilized by offensive security tools to perform brute force, forced browsing, and dictionary attacks. ScrapPY performs word frequency, entropy, and metadata analysis, and can run in full output modes to craft custom wordlists for targeted attacks. The tool dives deep to discover keywords and phrases leading to potential passwords or hidden directories, outputting to a text file that is readable by tools such as Hydra, Dirb, and Nmap. Expedite initial access, vulnerability discovery, and lateral movement with ScrapPY!
+![ScrapPY Banner](banner.png)
 
-# Demo:
+ScrapPY is an innovative and comprehensive Python utility, designed to scan PDF files such as manuals, documents, and other sensitive materials. This utility generates targeted wordlists, which can be used in a variety of cybersecurity applications like brute force attacks, forced browsing, and dictionary attacks. Unlike its predecessor, [www-project-scrappy](https://github.com/RoseSecurity/ScrapPY), this fork is designed for maximum user-friendliness, offering a graphical interface, multilingual support, faster performance through concurrent page reading, extensive logging, and more.
 
-https://user-images.githubusercontent.com/72598486/201235531-6b037daf-d1f3-4d33-b256-8411e3a0b3da.mov
+## 📑 Table of Contents
+- [Features](#-features)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Progress](#-progress)
+- [Output](#-output)
+- [Integration with Other Tools](#-integration-with-other-tools)
+- [Future Development](#-future-development)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-# Install:
+## ✨ Features
+### Intuitive User Interface
+- **Zero Command-Line Requirement**: Designed with accessibility in mind. Anyone can use it; no need to navigate through the command line.
+- **Multilingual Support**: Localize the application with language-specific JSON files.
+  
+### Advanced Analysis Modes
+- **Multiple Modes of Operation**: Includes 'word-frequency', 'full', 'metadata', and 'entropy' modes.
+  
+### Performance
+- **Concurrent Page Reading**: Utilizes multithreading for data extraction, significantly speeding up the process.
 
-Download Repository:
+### Robust Logging
+- **Extensive Logging**: Keeps track of events and errors in `ScrapPY.log`.
 
-```
-$ mkdir ScrapPY
-$ cd ScrapPY/
-$ sudo git clone https://github.com/RoseSecurity/ScrapPY.git
-```
+### Customization
+- **Custom Output**: Allows users to specify the name of the output file.
 
-Install Dependencies:
+## 💽 Installation
 
-```
-$ pip3 install -r requirements.txt
-```
+1. **Clone the Repository**:
+    ```bash
+    mkdir MyScrapPY
+    cd MyScrapPY/
+    git clone https://github.com/[YourUsername]/ScrapPY.git
+    ```
+2. **Install Dependencies**:
+    ```bash
+    pip3 install -r requirements.txt
+    ```
 
-# ScrapPY Usage:
-
-```
-usage: ScrapPY.py [-h] [-f FILE] [-m {word-frequency,full,metadata,entropy}] [-o OUTPUT]
-```
-
-
-Output metadata of document:
-
-```
-$ python3 ScrapPY.py -f example.pdf -m metadata
-```
-
-Output top 100 frequently used keywords to a file name ```Top_100_Keywords.txt```:
-
-```
-$ python3 ScrapPY.py -f example.pdf -m word-frequency -o Top_100_Keywords.txt
-```
-
-Output all keywords to default ScrapPY.txt file:
-
-```
-$ python3 ScrapPY.py -f example.pdf
-```
-
-Output top 100 keywords with highest entropy rating:
-
-```
-$ python3 ScrapPY.py -f example.pdf -m entropy
+## 🛠 Usage
+Run the script to interactively select the language and operation mode.
+```bash
+python3 MyScrapPY.py
 ```
 
-ScrapPY Output:
+### 🚀 Modes of Operation
+- `word-frequency`: Outputs the 100 most frequently used keywords.
+- `full`: Outputs all unique keywords.
+- `metadata`: Outputs PDF metadata like title, author, etc.
+- `entropy`: Outputs the 100 keywords with the highest entropy rating.
 
-```
-# ScrapPY outputs the ScrapPY.txt file or specified name file to the directory in which the tool was ran. To view the first fifty lines of the file, run this command:
+## 📊 Progress
 
-$ head -50 ScrapPY.txt
+The program features an ASCII progress bar to give you real-time updates on its operation.
 
-# To see how many words were generated, run this command:
-
-$ wc -l ScrapPY.txt
-```
-
-# Integration with Offensive Security Tools:
-
-Easily integrate with tools such as Dirb to expedite the process of discovering hidden subdirectories:
-
-```
-root@RoseSecurity:~# dirb http://192.168.1.123/ /root/ScrapPY/ScrapPY.txt
-
------------------
-DIRB v2.21
-By The Dark Raver
------------------
-
-START_TIME: Fri May 16 13:41:45 2014
-URL_BASE: http://192.168.1.123/
-WORDLIST_FILES: /root/ScrapPY/ScrapPY.txt
-
------------------
-
-GENERATED WORDS: 4592
-
----- Scanning URL: http://192.168.1.123/ ----
-==> DIRECTORY: http://192.168.1.123/vi/
-+ http://192.168.1.123/programming (CODE:200|SIZE:2726)
-+ http://192.168.1.123/s7-logic/ (CODE:403|SIZE:1122)
-==> DIRECTORY: http://192.168.1.123/config/
-==> DIRECTORY: http://192.168.1.123/docs/
-==> DIRECTORY: http://192.168.1.123/external/
+```bash
+[====================100====================]
 ```
 
-Utilize ScrapPY with Hydra for advanced brute force attacks:
+## 🗂 Output
+The tool generates a text file, either with a default name of `ScrapPY.txt` or a name specified by the user.
 
-```
-root@RoseSecurity:~# hydra -l root -P /root/ScrapPY/ScrapPY.txt -t 6 ssh://192.168.1.123
-Hydra v7.6 (c)2013 by van Hauser/THC & David Maciejak - for legal purposes only
+### File Commands
+- **View the first 50 lines**:
 
-Hydra (http://www.thc.org/thc-hydra) starting at 2014-05-19 07:53:33
-[DATA] 6 tasks, 1 server, 1003 login tries (l:1/p:1003), ~167 tries per task
-[DATA] attacking service ssh on port 22
-```
+    ```
+    head -50 MyScrapPY.txt
+    ```
+- **Check the word count**:
 
-Enhance Nmap scripts with ScrapPY wordlists:
+    ```
+    wc -l MyScrapPY.txt
+    ```
 
-```
-nmap -p445 --script smb-brute.nse --script-args userdb=users.txt,passdb=ScrapPY.txt 192.168.1.123
-```
+## 🛠 Integration with Other Tools
+- **Dirb**:
 
-## Future Development:
+    ```
+    dirb http://192.168.1.123/ /path/to/MyScrapPY.txt
+    ```
+- **Hydra**:
 
-- [x] Allow for custom output file naming and increased verbosity
-- [x] Integrate different modes of operation including word frequency analysis
-- [x] Allow for metadata analysis
-- [x] Search for high-entropy data
-- [ ] Search for path-like data 
-- [ ] Implement image OCR to enumerate data from images in PDFs
-- [ ] Allow for processing of multiple PDFs
+    ```
+    hydra -l root -P /path/to/MyScrapPY.txt -t 6 ssh://192.168.1.123
+    ```
+- **Nmap**:
+
+    ```
+    nmap -p445 --script smb-brute.nse --script-args userdb=users.txt,passdb=MyScrapPY.txt 192.168.1.123
+    ```
+
+## 🌟 Future Development
+- OCR support to extract data from images in PDFs.
+- Add a command-line interface as an alternative.
+- Enhance metadata analysis capabilities.
+- Implement unit tests for better code maintainability.
+
+## 👩‍💻 Contributing
+Feel free to open issues or PRs for additional features, bug fixes, or other types of contributions. Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+## 📄 License
+MIT License. See `LICENSE` for more information.
+
+---
+
+© 2023 [YourUsername]
