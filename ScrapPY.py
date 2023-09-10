@@ -1,160 +1,130 @@
-#!/usr/bin/env python3
-
+import os
+import sys
+import json
 from scipy.stats import entropy
 from collections import Counter
-from datetime import datetime
-import pandas as pd
-import argparse
 import PyPDF2
-import textract
-import time
 import re
-import sys
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
 
+print("Available languages: en, es, de, fr, ru, zh")
+language = input("Select a language: ")
 
-# Variables
-BLUE = '\033[34m'
-RED = '\033[91m'
-GREEN = '\033[92m'
-NORM = '\x1b[0m'
-tag = "@RoseSecurity"
+script_dir = os.path.dirname(os.path.realpath(__file__))
+localization_path = os.path.join(script_dir, "localizations", f"{language}.json")
 
-# Banner
-print(BLUE + """
-  ______                         ______  _     _
- / _____)                       (_____ \| |   | |
-( (____   ____  ____ _____ ____  _____) ) |___| |
- \____ \ / ___)/ ___|____ |  _ \|  ____/|_____  |
- _____) | (___| |   / ___ | |_| | |      _____| |
-(______/ \____)_|   \_____|  __/|_|     (_______|
-                          |_|
-""" + NORM)
-time.sleep(1)
+if not os.path.exists(localization_path):
+    print("Error: Localization file does not exist.")
+    sys.exit(1)
 
-# Arguments
-parser = argparse.ArgumentParser(description='\nScrapPY enumerates documents, manuals, and sensitive PDFs for key phrases and words that can be utilized in dictionary and brute force attacks. These keywords are outputted to a text file (ScrapPY.txt in the directory which the tool was ran from)that can be read by tools such as Hydra, Dirb, and other offensive security tools for initial access and lateral movement.\t' + GREEN + tag + NORM)
-parser.add_argument('-f','--file', help='PDF input file')
-parser.add_argument('-m', '--mode', choices=['word-frequency', 'full', 'metadata', 'entropy'], help='Modes of operation: full - All keywords, word-frequency - 100 most frequently used keywords, metadata - Title, author, and extracted metadata, entropy - 100 most random keywords, potentially disclosing password hashes or hardcoded keys', default='full')
-parser.add_argument('-o', '--output', help='Name of file to output')
-args = parser.parse_args()
+with open(localization_path, 'r') as f:
+    localization = json.load(f)
 
-def read_file():
-    # Open provided file
-    global common_words
-    pdf_file = open(args.file, 'rb')
-    read_pdf = PyPDF2.PdfFileReader(pdf_file)
-    page_nums = int(read_pdf.numPages)
+log_path = os.path.join(script_dir, "ScrapPY.log")
+with open(log_path, "w") as log_file:
+    log_file.write(localization["starting"] + "\n")
 
-    # Loop through each page and convert to text
-    loop_count = 0
-    page_text = " "
+print(localization["choose_mode"])
+print("Available Modes:")
+print("  word-frequency: List 100 most common words in the PDF")
+print("  full: List all unique words in the PDF")
+print("  metadata: Display metadata information about the PDF")
+print("  entropy: Calculate entropy for unique words in the PDF")
+mode_choice = input("Select a mode: ")
 
-    while loop_count < page_nums:
-        page_obj = read_pdf.getPage(loop_count)
-        loop_count += 1
-        page_text += page_obj.extractText()
+pdf_file_path = input(localization["enter_path"])
 
-    # Lowercase each word
-    page_text = str(page_text.encode('ascii','ignore').lower())
+if not os.path.exists(pdf_file_path):
+    print(localization["file_not_exist"])
+    sys.exit(1)
 
-    # Extracting keywords
-    keywords = re.findall(r'[a-zA-Z]\w+', page_text)
+if not pdf_file_path.lower().endswith('.pdf'):
+    print(localization["not_pdf"])
+    sys.exit(1)
 
-    # Remove common words
-    common_words = [ "and", "the", "at", "there", "some", "my", "of", "be", "use", "her", "than", "and", "this", "an", "would", "first", "a", "have", "each",   "to", "from", "which", "like", "been", "in", "or", "she", "him",  "is", "one", "do", "into", "who", "you", "had", "how", "that", "by", "their", "has", "its", "it", "if", "he", "but", "was", "not", "up", "more", "for", "are", "were", "as", "we", "with", "when", "then", "no", "come", "his", "your", "them", "way", "they", "can", "these", "could", "may", "I", "said", "so" ]
+output_file_name = input(localization["output_file"])
 
-    for word in list(keywords):
-        if word in common_words:
-            keywords.remove(word)
-    return keywords
-
-def dedup(keywords):
-    # Deduplicate keywords
-    unduped_keywords = list(dict.fromkeys(keywords))
-    keywords = unduped_keywords
-    output_file(unduped_keywords)
-
-def mode(keywords):
-    if args.mode == "word-frequency":
-        keyword_count = Counter(keywords)
-        common_keywords = []
-        for word, count in keyword_count.most_common(100):
-            common_keywords.append(word)
-        keywords = common_keywords
-        output_file(keywords)
-    if args.mode == "metadata":
-        with open(args.file, 'rb') as pdf_file:
-            read_pdf = PyPDF2.PdfFileReader(pdf_file)
-            pdf_info = read_pdf.getDocumentInfo()
-            author = pdf_info.author
-            creator = pdf_info.creator
-            producer = pdf_info.producer
-            title = pdf_info.title
-            subject = pdf_info.subject
-            creation_date = str(pdf_info.creation_date)
-            print(BLUE + "Title: " + NORM + title)
-            print(BLUE + "Subject: " + NORM + subject)
-            print(BLUE + "Author: " + NORM + author)
-            if creator == producer:
-                print(BLUE + "Creator: " + NORM + creator)
-            else:
-                print(BLUE + "Producer: " + NORM + producer)
-                print(BLUE + "Creator: " + NORM + creator)
-            print(BLUE + "Creation Date: " + NORM + creation_date + "\n")
-            sys.exit(0)
-    if args.mode == "entropy":
-        unduped_keywords = list(dict.fromkeys(keywords))
-        # Pass deduplicated keywords to byte array function
-        entropy_conv(unduped_keywords)
-    else:
-        dedup(keywords)
-
-# Convert dedplicated keywords to byte array and pass to entropy calculation function
-def entropy_conv(unduped_keywords):
-    keyword_bytearray_list = []
-    for word in unduped_keywords:
-        keyword_bytearray_list.append(bytearray(word, "utf-8"))
-    entropy_calc(keyword_bytearray_list)
-    
-def entropy_calc(keyword_bytearray_list):
-    # Detetmine entropy score
-    entropy_score = []
-    for word in keyword_bytearray_list:
-        byte_series = pd.Series(word)
-        entropy_score.append(float(entropy(byte_series.value_counts())))
-    # Decode keyword list
-    keywords_list = []
-    for word in keyword_bytearray_list:
-        keywords_list.append(str(word.decode("utf-8")))
-    # Create dictionary of keywords and entropy scores
-    score_dict = {keywords_list[i]: entropy_score[i] for i in range(len(keywords_list))}
-    sorted_score_dict = Counter(dict(sorted(score_dict.items(),
-                           key=lambda item: item[1],
-                           reverse=True)))   
-    for key,value in sorted_score_dict.most_common(100):
-        print( BLUE + "Keyword: " + NORM + key + BLUE + "\t\tEntropy Score: " + NORM + str(value))
-
-def output_file(keywords):
-    # Create output file
-    if args.output:
-        with open(args.output, "w+") as file:
-            for word in (keywords):
-                file.write('%s\n' %word)
-        file.close()
-        print(args.output + " has been created!")
-    else:
-        with open("ScrapPY.txt", "w+") as file:
-            for word in (keywords):
-                file.write('%s\n' %word)
-        file.close()
-        print("ScrapPY.txt has been created!")
+def read_page(page):
+    try:
+        page_text = page.extract_text()
+        keywords = re.findall(r'[a-zA-Z]\w+', page_text.lower())
+        return keywords
+    except Exception as e:
+        with open(log_path, "a") as log_file:
+            log_file.write(f"Error reading page: {e}\n")
+        return []
 
 def main():
-# Evaluate arguments
-    if args.file:
-        read_keywords = read_file()
-        mode_keywords = mode(read_keywords)
-    else:
-        print(RED + "\nEnter PDF file to scrape or use -h for help menu\n" + NORM)
+    try:
+        with open(log_path, "a") as log_file:
+            log_file.write(localization["processing"] + "\n")
 
-main()
+        pdf_file = open(pdf_file_path, 'rb')
+        read_pdf = PyPDF2.PdfReader(pdf_file)
+        num_pages = len(read_pdf.pages)
+
+        keywords = []
+        with ThreadPoolExecutor() as executor:
+            future_to_page = {executor.submit(read_page, read_pdf.pages[i]): i for i in range(num_pages)}
+            for future in future_to_page:
+                keywords += future.result()
+
+        if mode_choice == 'metadata':
+            metadata_dict = metadata(pdf_file_path)
+            output_to_file(metadata_dict, output_file_name)
+        else:
+            if mode_choice == 'word-frequency':
+                result = word_frequency(keywords)
+            elif mode_choice == 'full':
+                result = dedup(keywords)
+            elif mode_choice == 'entropy':
+                result = calculate_entropy(keywords)
+            else:
+                print("Invalid mode selected.")
+                sys.exit(1)
+            output_to_file(result, output_file_name)
+
+        with open(log_path, "a") as log_file:
+            log_file.write(localization["complete"] + "\n")
+
+    except Exception as e:
+        with open(log_path, "a") as log_file:
+            log_file.write(localization["error"] + f": {e}\n")
+
+def metadata(file_path):
+    with open(file_path, 'rb') as pdf_file:
+        read_pdf = PyPDF2.PdfReader(pdf_file)
+        pdf_info = read_pdf.metadata
+        return {
+            "Title": pdf_info.get('/Title', 'N/A'),
+            "Subject": pdf_info.get('/Subject', 'N/A'),
+            "Author": pdf_info.get('/Author', 'N/A'),
+            "Creator": pdf_info.get('/Creator', 'N/A'),
+            "Producer": pdf_info.get('/Producer', 'N/A'),
+            "Creation Date": str(pdf_info.get('/CreationDate', 'N/A'))
+        }
+
+def word_frequency(keywords):
+    return Counter(keywords).most_common(100)
+
+def calculate_entropy(keywords):
+    keyword_bytearray_list = [bytearray(word, 'utf-8') for word in keywords]
+    entropy_scores = [float(entropy(pd.Series(word).value_counts())) for word in keyword_bytearray_list]
+    return dict(sorted({keywords[i]: entropy_scores[i] for i in range(len(keywords))}.items(), key=lambda x: x[1], reverse=True))
+
+def dedup(keywords):
+    return list(set(keywords))
+
+def output_to_file(result, output_file_name):
+    output_path = os.path.join(script_dir, output_file_name if output_file_name else "ScrapPY.txt")
+    with open(output_path, 'w') as f:
+        if isinstance(result, dict):
+            for key, value in result.items():
+                f.write(f"{key}: {value}\n")
+        else:
+            for item in result:
+                f.write(f"{item}\n")
+
+if __name__ == "__main__":
+    main()
