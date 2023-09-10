@@ -1,0 +1,12 @@
+{
+    "starting": "启动 ScrapPY...",
+    "enter_path": "请输入 PDF 文件的路径：",
+    "file_not_exist": "错误：指定的 PDF 文件不存在。",
+    "not_pdf": "错误：指定的文件不是 PDF。",
+    "choose_mode": "请选择操作模式：",
+    "output_file": "请输入输出文件的名称（留空为默认）：",
+    "processing": "处理中...",
+    "complete": "处理完成。",
+    "error": "发生错误"
+  }
+  
