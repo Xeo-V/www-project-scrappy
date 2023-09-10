@@ -3,7 +3,7 @@
 
 ![ScrapPY Banner](banner.png)
 
-ScrapPY is an innovative and comprehensive Python utility, designed to scan PDF files such as manuals, documents, and other sensitive materials. This utility generates targeted wordlists, which can be used in a variety of cybersecurity applications like brute force attacks, forced browsing, and dictionary attacks. Unlike its predecessor, [www-project-scrappy]([https://github.com/RoseSecurity/ScrapPY](https://github.com/OWASP/www-project-scrappy)), this fork is designed for maximum user-friendliness, offering a graphical interface, multilingual support, faster performance through concurrent page reading, extensive logging, and more.
+ScrapPY is an innovative and comprehensive Python utility, designed to scan PDF files such as manuals, documents, and other sensitive materials. This utility generates targeted wordlists, which can be used in a variety of cybersecurity applications like brute force attacks, forced browsing, and dictionary attacks. Unlike its predecessor, [www-project-scrappy]((https://github.com/OWASP/www-project-scrappy)), this fork is designed for maximum user-friendliness, offering a graphical interface, multilingual support, faster performance through concurrent page reading, extensive logging, and more.
 
 ## 📑 Table of Contents
 - [Features](#-features)
