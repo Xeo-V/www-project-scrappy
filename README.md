@@ -20,6 +20,7 @@ ScrapPY is an innovative and comprehensive Python utility, designed to scan PDF 
 ### Intuitive User Interface
 - **Zero Command-Line Requirement**: Designed with accessibility in mind. Anyone can use it; no need to navigate through the command line.
 - **Multilingual Support**: Localize the application with language-specific JSON files.
+- **ASCII progress bar**: The program features an ASCII progress bar to give you real-time updates on its operation.
   
 ### Advanced Analysis Modes
 - **Multiple Modes of Operation**: Includes 'word-frequency', 'full', 'metadata', and 'entropy' modes.
@@ -61,8 +62,6 @@ python3 MyScrapPY.py
 - `entropy`: Outputs the 100 keywords with the highest entropy rating.
 
 ## 📊 Progress
-
-The program features an ASCII progress bar to give you real-time updates on its operation.
 
 ```
 [====================100====================]
